@@ -281,14 +281,14 @@ export default function App() {
             <div className="grid gap-3 sm:grid-cols-2">
               <NumberInput label="Number of trucks" value={trucks} onChange={setTrucks} />
               <NumberInput label="Empty trucks" value={emptyTrucks} onChange={setEmptyTrucks} />
-              <NumberInput label="Average hires / mo." value={hiresPerMonth} onChange={setHiresPerMonth} />
-              <NumberInput label="Profit / truck / mo." value={profitPerTruckPerMonth} onChange={setProfitPerTruckPerMonth} suffix="$" />
-              <NumberInput label="Driver marketing / mo." value={currentMarketingMonthly} onChange={setCurrentMarketingMonthly} suffix="$" />
+              <NumberInput label="Average hires / mo" value={hiresPerMonth} onChange={setHiresPerMonth} />
+              <NumberInput label="Profit / truck / mo" value={profitPerTruckPerMonth} onChange={setProfitPerTruckPerMonth} suffix="$" />
+              <NumberInput label="Driver marketing / mo" value={currentMarketingMonthly} onChange={setCurrentMarketingMonthly} suffix="$" />
             </div>
             <div className="grid gap-3 mt-4 md:grid-cols-3">
-              <Stat label="Spending / mo." value={<Dollars v={calc.currentMonthlyTotal} />} />
-              <Stat label="Lost rev. / mo." value={<Dollars v={calc.lostRevenueMonthly} />} />
-              <Stat label="Current cost / yr." value={<Dollars v={calc.currentYearlyTotal} />} />
+              <Stat label="Spending / mo" value={<Dollars v={calc.currentMonthlyTotal} />} />
+              <Stat label="Lost rev. / mo" value={<Dollars v={calc.lostRevenueMonthly} />} />
+              <Stat label="Current cost / yr" value={<Dollars v={calc.currentYearlyTotal} />} />
             </div>
           </div>
 
@@ -323,13 +323,13 @@ export default function App() {
                   <NumberInput label="Amortize DWY over (months)" value={dwyAmortizationMonths} onChange={setDwyAmortizationMonths} />
                 </>
               )}
-              <NumberInput label="Avg drivers needed / mo." value={driversNeededMonthly} onChange={setDriversNeededMonthly} />
+              <NumberInput label="Avg drivers needed / mo" value={driversNeededMonthly} onChange={setDriversNeededMonthly} />
               <NumberInput label="Estimated ad spend / driver" value={ciAdMonthly} onChange={setCiAdMonthly} suffix="$" />
             </div>
             <div className="grid gap-3 mt-4 md:grid-cols-3">
-              <Stat label="Plan cost / mo." value={<Dollars v={calc.monthlyPlanFee} />} />
-              <Stat label="Est. ad spend / mo" value={<Dollars v={calc.monthlyAdSpend} />} />
-              <Stat label="Est. cost / yr." value={<Dollars v={calc.withYearlyTotal} />} />
+              <Stat label="Plan cost / mo" value={<Dollars v={calc.monthlyPlanFee} />} />
+              <Stat label="Est ad spend / mo" value={<Dollars v={calc.monthlyAdSpend} />} />
+              <Stat label="Est cost / yr" value={<Dollars v={calc.withYearlyTotal} />} />
             </div>
           </div>
         </section>
@@ -339,10 +339,10 @@ export default function App() {
           <div className="card rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5 avoid-break">
             <h2 className="mb-3 font-semibold text-lg">Comparison — Before vs After</h2>
             <div className="grid gap-3 md:grid-cols-4">
-              <Stat label="Current cost / mo." value={<Dollars v={calc.currentMonthlyCost} />} />
-              <Stat label="Est. costs with CI / mo." value={<Dollars v={calc.withMonthlyCost} />} />
-              <Stat label="Est. savings / mo." value={<Dollars v={calc.monthlySavings} />} />
-              <Stat label="Est. savings / yr." value={<Dollars v={calc.yearlySavings} />} />
+              <Stat label="Current cost / mo" value={<Dollars v={calc.currentMonthlyCost} />} />
+              <Stat label="Est costs with CI / mo" value={<Dollars v={calc.withMonthlyCost} />} />
+              <Stat label="Est savings / mo" value={<Dollars v={calc.monthlySavings} />} />
+              <Stat label="Est savings / yr" value={<Dollars v={calc.yearlySavings} />} />
             </div>
           </div>
         </section>
