@@ -211,17 +211,30 @@ export default function App() {
     <div className="min-h-screen bg-[#0E2F36] text-white">
       {/* Print helpers: keep dark colors, stronger borders, avoid breaks */}
       <style>{`
-        @media print {
-          * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          @page { margin: 14mm; }
-          .no-print { display: none !important; }
-          .avoid-break { break-inside: avoid; page-break-inside: avoid; }
-          /* Ensure the body keeps the dark background when printing */
-          body, html, #root { background: ${BRAND.bg} !important; }
-          /* Slightly stronger card borders for print contrast */
-          .card { border-color: rgba(255,255,255,0.25) !important; }
-        }
-      `}</style>
+  @media print {
+    /* Force landscape + set margins */
+    @page { size: landscape; margin: 12mm; }
+
+    /* Keep on-screen colors in the PDF */
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    /* Make sure the whole page stays dark */
+    html, body, #root { background: ${BRAND.bg} !important; }
+
+    /* Prevent UI controls from printing */
+    .no-print { display: none !important; }
+
+    /* Avoid awkward page breaks in cards/sections */
+    .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+
+    /* Stronger borders for print contrast */
+    .card { border-color: rgba(255,255,255,0.25) !important; }
+
+    /* Sticky headers can crop in print; make them static */
+    header { position: static !important; top: auto !important; }
+  }
+`}</style>
+
 
       <header className="sticky top-0 z-10" style={{ background: BRAND.bg }}>
         <div className="mx-auto max-w-5xl px-5 py-4 flex items-center justify-between gap-3">
