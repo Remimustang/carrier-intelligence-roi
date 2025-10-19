@@ -346,6 +346,7 @@ export default function App() {
           </div>
         </section>
 
+
         {/* Notes */}
         <section className="card rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5 avoid-break">
           <h2 className="mb-3 font-semibold text-lg">Notes</h2>
