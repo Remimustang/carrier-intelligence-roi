@@ -328,8 +328,8 @@ export default function App() {
             </div>
             <div className="grid gap-3 mt-4 md:grid-cols-3">
               <Stat label="Plan cost / mo." value={<Dollars v={calc.monthlyPlanFee} />} />
-              <Stat label="Ad spend / mo." value={<Dollars v={calc.monthlyAdSpend} />} />
-              <Stat label="Cost / yr." value={<Dollars v={calc.withYearlyTotal} />} />
+              <Stat label="Est. ad spend / mo." value={<Dollars v={calc.monthlyAdSpend} />} />
+              <Stat label="Est. cost / yr." value={<Dollars v={calc.withYearlyTotal} />} />
             </div>
           </div>
         </section>
@@ -340,9 +340,9 @@ export default function App() {
             <h2 className="mb-3 font-semibold text-lg">Comparison — Before vs After</h2>
             <div className="grid gap-3 md:grid-cols-4">
               <Stat label="Current cost / mo." value={<Dollars v={calc.currentMonthlyCost} />} />
-              <Stat label="CI cost / mo." value={<Dollars v={calc.withMonthlyCost} />} />
-              <Stat label="Savings / mo." value={<Dollars v={calc.monthlySavings} />} />
-              <Stat label="Savings / yr." value={<Dollars v={calc.yearlySavings} />} />
+              <Stat label="Est. Carrier Intelligence costs / mo." value={<Dollars v={calc.withMonthlyCost} />} />
+              <Stat label="Est. savings / mo." value={<Dollars v={calc.monthlySavings} />} />
+              <Stat label="Est. savings / yr." value={<Dollars v={calc.yearlySavings} />} />
             </div>
           </div>
         </section>
