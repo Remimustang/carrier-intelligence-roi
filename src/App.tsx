@@ -281,9 +281,9 @@ export default function App() {
             <div className="grid gap-3 sm:grid-cols-2">
               <NumberInput label="Number of trucks" value={trucks} onChange={setTrucks} />
               <NumberInput label="Empty trucks" value={emptyTrucks} onChange={setEmptyTrucks} />
-              <NumberInput label="Average hires / mo" value={hiresPerMonth} onChange={setHiresPerMonth} />
-              <NumberInput label="Profit / truck / mo" value={profitPerTruckPerMonth} onChange={setProfitPerTruckPerMonth} suffix="$" />
-              <NumberInput label="Driver marketing / mo" value={currentMarketingMonthly} onChange={setCurrentMarketingMonthly} suffix="$" />
+              <NumberInput label="Average hires / month" value={hiresPerMonth} onChange={setHiresPerMonth} />
+              <NumberInput label="Profit / truck / month" value={profitPerTruckPerMonth} onChange={setProfitPerTruckPerMonth} suffix="$" />
+              <NumberInput label="Driver marketing / month" value={currentMarketingMonthly} onChange={setCurrentMarketingMonthly} suffix="$" />
             </div>
             <div className="grid gap-3 mt-4 md:grid-cols-3">
               <Stat label="Spending / mo" value={<Dollars v={calc.currentMonthlyTotal} />} />
@@ -323,13 +323,13 @@ export default function App() {
                   <NumberInput label="Amortize DWY over (months)" value={dwyAmortizationMonths} onChange={setDwyAmortizationMonths} />
                 </>
               )}
-              <NumberInput label="Avg drivers needed / mo" value={driversNeededMonthly} onChange={setDriversNeededMonthly} />
+              <NumberInput label="Avg drivers needed / month" value={driversNeededMonthly} onChange={setDriversNeededMonthly} />
               <NumberInput label="Estimated ad spend / driver" value={ciAdMonthly} onChange={setCiAdMonthly} suffix="$" />
             </div>
             <div className="grid gap-3 mt-4 md:grid-cols-3">
-              <Stat label="Plan cost / mo" value={<Dollars v={calc.monthlyPlanFee} />} />
-              <Stat label="Est ad spend / mo" value={<Dollars v={calc.monthlyAdSpend} />} />
-              <Stat label="Est cost / yr" value={<Dollars v={calc.withYearlyTotal} />} />
+              <Stat label="Plan cost / month" value={<Dollars v={calc.monthlyPlanFee} />} />
+              <Stat label="Est ad spend / month" value={<Dollars v={calc.monthlyAdSpend} />} />
+              <Stat label="Est cost / year" value={<Dollars v={calc.withYearlyTotal} />} />
             </div>
           </div>
         </section>
