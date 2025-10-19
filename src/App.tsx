@@ -287,7 +287,7 @@ export default function App() {
             </div>
             <div className="grid gap-3 mt-4 md:grid-cols-3">
               <Stat label="Spending / mo" value={<Dollars v={calc.currentMonthlyTotal} />} />
-              <Stat label="Lost rev. / mo" value={<Dollars v={calc.lostRevenueMonthly} />} />
+              <Stat label="Lost revenue / mo" value={<Dollars v={calc.lostRevenueMonthly} />} />
               <Stat label="Current cost / yr" value={<Dollars v={calc.currentYearlyTotal} />} />
             </div>
           </div>
@@ -339,10 +339,10 @@ export default function App() {
           <div className="card rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5 avoid-break">
             <h2 className="mb-3 font-semibold text-lg">Comparison — Before vs After</h2>
             <div className="grid gap-3 md:grid-cols-4">
-              <Stat label="Current cost / mo" value={<Dollars v={calc.currentMonthlyCost} />} />
-              <Stat label="Est costs with CI / mo" value={<Dollars v={calc.withMonthlyCost} />} />
-              <Stat label="Est savings / mo" value={<Dollars v={calc.monthlySavings} />} />
-              <Stat label="Est savings / yr" value={<Dollars v={calc.yearlySavings} />} />
+              <Stat label="Current cost / month" value={<Dollars v={calc.currentMonthlyCost} />} />
+              <Stat label="Est costs with CI / month" value={<Dollars v={calc.withMonthlyCost} />} />
+              <Stat label="Est savings / month" value={<Dollars v={calc.monthlySavings} />} />
+              <Stat label="Est total savings / year" value={<Dollars v={calc.yearlySavings} />} />
             </div>
           </div>
         </section>
