@@ -41,7 +41,7 @@ function Stat({
   big?: boolean;
 }) {
   return (
-    <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+    <div className="card p-4 rounded-2xl bg-white/5 border border-white/10">
       <div className="text-white/60 text-xs mb-1">{label}</div>
       <div className={`text-white ${big ? "text-2xl" : "text-lg"} font-semibold`}>
         {value}
@@ -202,138 +202,47 @@ export default function App() {
     dwyAmortizationMonths,
   ]);
 
-  // -------- Export PDF (Safari-safe iframe, includes everything + notes) --------
+  // -------- Export PDF: print the actual page (dark theme) --------
   function exportPdf() {
-    const notesHtml = (notes || "—")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\n/g, "<br/>");
-
-    const html = `
-<!doctype html><html><head><meta charset="utf-8"/><title>${companyName || "Company"} — ROI Summary</title>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<style>
-body{font-family:Arial,Helvetica,sans-serif;margin:28px;color:#111;}
-h1{font-size:22px;margin:0 0 6px;}
-h2{font-size:16px;margin:18px 0 6px;}
-table{border-collapse:collapse;width:100%;margin-top:6px;}
-td,th{border:1px solid #ccc;padding:6px;font-size:13px;vertical-align:top;}
-th{background:#f7f7f7;text-align:left;}
-.brand{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.logo{height:40px}
-.small{color:#555}
-hr{border:none;border-top:1px solid #eee;margin:16px 0;}
-@media print {.no-print{display:none}}
-</style></head><body>
-<div class="brand"><img class="logo" src="${LOGO_SRC}" alt="Carrier Intelligence"/>
-<div><h1>Carrier Intelligence — ROI Calculator</h1>
-<div class="small">Personalized Report</div></div></div>
-
-<h2>Document</h2>
-<table><tbody>
-<tr><th>Company</th><td>${companyName || "-"}</td></tr>
-<tr><th>Representative</th><td>${representative || "-"}</td></tr>
-<tr><th>Date</th><td>${date || new Date().toLocaleDateString()}</td></tr>
-</tbody></table>
-
-<h2>Inputs — Current</h2>
-<table><tbody>
-<tr><th>Number of trucks</th><td>${trucks || "-"}</td></tr>
-<tr><th>Empty trucks</th><td>${emptyTrucks || "-"}</td></tr>
-<tr><th>Average hires / mo.</th><td>${hiresPerMonth || "-"}</td></tr>
-<tr><th>Profit / truck / mo.</th><td>${usd(num(profitPerTruckPerMonth))}</td></tr>
-<tr><th>Driver marketing / mo.</th><td>${usd(num(currentMarketingMonthly))}</td></tr>
-</tbody></table>
-
-<h2>Inputs — With Carrier Intelligence</h2>
-<table><tbody>
-<tr><th>Plan</th><td>${plan}</td></tr>
-<tr><th>DFY monthly fee</th><td>${usd(num(dfyMonthly))}</td></tr>
-<tr><th>DWY one-time fee</th><td>${usd(num(dwyOneTime))}</td></tr>
-<tr><th>DWY amortize (months)</th><td>${dwyAmortizationMonths}</td></tr>
-<tr><th>Avg drivers needed / mo.</th><td>${driversNeededMonthly || "-"}</td></tr>
-<tr><th>Estimated ad spend / driver</th><td>${usd(num(ciAdMonthly))}</td></tr>
-</tbody></table>
-
-<h2>Before (Current)</h2>
-<table><tbody>
-<tr><th>Spending / mo.</th><td>${usd(calc.currentMonthlyTotal)}</td></tr>
-<tr><th>Lost rev. / mo.</th><td>${usd(calc.lostRevenueMonthly)}</td></tr>
-<tr><th>Cost / yr.</th><td>${usd(calc.currentYearlyTotal)}</td></tr>
-</tbody></table>
-
-<h2>After (With CI)</h2>
-<table><tbody>
-<tr><th>Plan cost / mo.</th><td>${usd(calc.monthlyPlanFee)}</td></tr>
-<tr><th>Ad spend / mo.</th><td>${usd(calc.monthlyAdSpend)}</td></tr>
-<tr><th>Cost / yr.</th><td>${usd(calc.withYearlyTotal)}</td></tr>
-</tbody></table>
-
-<h2>Comparison</h2>
-<table><tbody>
-<tr><th>Current cost / mo.</th><td>${usd(calc.currentMonthlyCost)}</td></tr>
-<tr><th>CI cost / mo.</th><td>${usd(calc.withMonthlyCost)}</td></tr>
-<tr><th>Savings / mo.</th><td>${usd(calc.monthlySavings)}</td></tr>
-<tr><th>Savings / yr.</th><td>${usd(calc.yearlySavings)}</td></tr>
-</tbody></table>
-
-<h2>Notes</h2>
-<div style="white-space:pre-wrap;border:1px solid #ccc;border-radius:8px;padding:10px;font-size:13px;">${notesHtml}</div>
-
-<script>window.onload=()=>window.print()</script>
-</body></html>`.trim();
-
-    // Hidden iframe approach (no pop-up)
-    const iframe = document.createElement("iframe");
-    iframe.style.position = "fixed";
-    iframe.style.right = "0";
-    iframe.style.bottom = "0";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
-    iframe.style.border = "0";
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow?.document;
-    if (!doc) {
-      alert("Printing failed: iframe unavailable.");
-      return;
-    }
-
-    doc.open();
-    doc.write(html);
-    doc.close();
-
-    iframe.onload = () => {
-      try {
-        iframe.contentWindow?.focus();
-        iframe.contentWindow?.print();
-      } finally {
-        setTimeout(() => document.body.removeChild(iframe), 1500);
-      }
-    };
+    window.print();
   }
 
   return (
     <div className="min-h-screen bg-[#0E2F36] text-white">
-      <header className="sticky top-0 z-10 bg-[#0E2F36]">
+      {/* Print helpers: keep dark colors, stronger borders, avoid breaks */}
+      <style>{`
+        @media print {
+          * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          @page { margin: 14mm; }
+          .no-print { display: none !important; }
+          .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+          /* Ensure the body keeps the dark background when printing */
+          body, html, #root { background: ${BRAND.bg} !important; }
+          /* Slightly stronger card borders for print contrast */
+          .card { border-color: rgba(255,255,255,0.25) !important; }
+        }
+      `}</style>
+
+      <header className="sticky top-0 z-10" style={{ background: BRAND.bg }}>
         <div className="mx-auto max-w-5xl px-5 py-4 flex items-center justify-between gap-3">
           <Logo />
-          <button
-            onClick={exportPdf}
-            className="rounded-2xl px-3 py-2 font-semibold"
-            style={{ background: BRAND.accent, color: "#073339" }}
-            title="Save as PDF"
-          >
-            Save as PDF
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={exportPdf}
+              className="rounded-2xl px-3 py-2 font-semibold no-print"
+              style={{ background: BRAND.accent, color: "#073339" }}
+              title="Print or Save as PDF"
+            >
+              Print / Save PDF
+            </button>
+          </div>
         </div>
         <div className="h-px w-full bg-white/10" />
       </header>
 
       <main className="mx-auto max-w-5xl px-5 py-8 space-y-8">
         {/* Document header */}
-        <section className="rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5">
+        <section className="card rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5 avoid-break">
           <h2 className="mb-3 font-semibold text-lg text-white/90">
             Carrier Intelligence ROI Calculator
           </h2>
@@ -346,7 +255,7 @@ hr{border:none;border-top:1px solid #eee;margin:16px 0;}
 
         {/* Current */}
         <section className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5">
+          <div className="card rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5 avoid-break">
             <h2 className="mb-3 font-semibold text-lg">Current situation</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <NumberInput label="Number of trucks" value={trucks} onChange={setTrucks} />
@@ -363,7 +272,7 @@ hr{border:none;border-top:1px solid #eee;margin:16px 0;}
           </div>
 
           {/* With CI */}
-          <div className="rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5">
+          <div className="card rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5 avoid-break">
             <h2 className="mb-3 font-semibold text-lg">Carrier Intelligence</h2>
             <div className="text-sm text-white/80 mb-1">Plan</div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -406,7 +315,7 @@ hr{border:none;border-top:1px solid #eee;margin:16px 0;}
 
         {/* Comparison */}
         <section>
-          <div className="rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5">
+          <div className="card rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5 avoid-break">
             <h2 className="mb-3 font-semibold text-lg">Comparison — Before vs After</h2>
             <div className="grid gap-3 md:grid-cols-4">
               <Stat label="Current cost / mo." value={<Dollars v={calc.currentMonthlyCost} />} />
@@ -418,7 +327,7 @@ hr{border:none;border-top:1px solid #eee;margin:16px 0;}
         </section>
 
         {/* Notes */}
-        <section className="rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5">
+        <section className="card rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5 avoid-break">
           <h2 className="mb-3 font-semibold text-lg">Notes</h2>
           <textarea
             value={notes}
