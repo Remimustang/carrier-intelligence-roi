@@ -207,32 +207,28 @@ export default function App() {
       {/* Print helpers: keep dark colors, stronger borders, avoid breaks */}
       <style>{`
   @media print {
-    /* Portrait + sane margins at 100% scale */
     @page { size: portrait; margin: 10mm; }
 
-    /* Keep dark colors as on screen */
-    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    html, body, #root { background: ${BRAND.bg} !important; margin: 0; padding: 0; }
+    /* Keep dark colors + 82% overall scale */
+    html, body, #root {
+      background: ${BRAND.bg} !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      margin: 0; padding: 0;
+      zoom: 0.82;                 /* <<< the new 82% scaling */
+    }
 
-    /* Make sticky header normal so it doesn't repeat */
     header { position: static !important; top: auto !important; }
-
-    /* Hide UI-only elements (e.g., the print button) */
     .no-print { display: none !important; }
 
-    /* Slightly tighter spacing in print to reduce big gaps */
     .print-tight .p-5 { padding: 14px !important; }
     .print-tight .mb-3 { margin-bottom: 8px !important; }
     .print-tight .py-8 { padding-top: 16px !important; padding-bottom: 16px !important; }
     .print-tight .space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 18px !important; }
 
-    /* Avoid awkward breaks inside cards/sections */
     .avoid-break { break-inside: avoid; page-break-inside: avoid; }
-
-    /* Stronger borders for print contrast */
     .card { border-color: rgba(255,255,255,0.25) !important; }
 
-    /* Inputs remain visible on dark background */
     input, textarea {
       background: rgba(255,255,255,0.05) !important;
       border-color: rgba(255,255,255,0.25) !important;
