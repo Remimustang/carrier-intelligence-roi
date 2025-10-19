@@ -253,7 +253,7 @@ export default function App() {
               style={{ background: BRAND.accent, color: "#073339" }}
               title="Print or Save as PDF"
             >
-              Print / Save PDF
+              Print PDF
             </button>
           </div>
         </div>
