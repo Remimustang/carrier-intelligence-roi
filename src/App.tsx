@@ -286,7 +286,7 @@ export default function App() {
               <NumberInput label="Driver marketing / month" value={currentMarketingMonthly} onChange={setCurrentMarketingMonthly} suffix="$" />
             </div>
             <div className="grid gap-3 mt-4 md:grid-cols-3">
-              <Stat label="Spending / mo" value={<Dollars v={calc.currentMonthlyTotal} />} />
+              <Stat label="Spending / month" value={<Dollars v={calc.currentMonthlyTotal} />} />
               <Stat label="Lost revenue / mo" value={<Dollars v={calc.lostRevenueMonthly} />} />
               <Stat label="Current cost / yr" value={<Dollars v={calc.currentYearlyTotal} />} />
             </div>
@@ -328,7 +328,7 @@ export default function App() {
             </div>
             <div className="grid gap-3 mt-4 md:grid-cols-3">
               <Stat label="Plan cost / month" value={<Dollars v={calc.monthlyPlanFee} />} />
-              <Stat label="Est ad spend / month" value={<Dollars v={calc.monthlyAdSpend} />} />
+              <Stat label="Est ad spend / mo" value={<Dollars v={calc.monthlyAdSpend} />} />
               <Stat label="Est cost / year" value={<Dollars v={calc.withYearlyTotal} />} />
             </div>
           </div>
