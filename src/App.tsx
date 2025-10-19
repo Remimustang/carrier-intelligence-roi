@@ -198,128 +198,49 @@ export default function App() {
 
   // -------- Export PDF: print the actual page (dark theme) --------
   function exportPdf() {
-    // Prevent double-invocation across browsers
-    // (e.g., rapid clicks or quirky afterprint behavior)
-    // @ts-expect-error attach flag on window
-    if (window.__ciPrinting) return;
-    // @ts-expect-error
-    window.__ciPrinting = true;
-  
-    const app = document.getElementById("app-root");
-    if (!app) {
-      // Fallback: just open the dialog once
-      window.print();
-      // @ts-expect-error
-      window.__ciPrinting = false;
-      return;
-    }
-  
-    // Clone current content into a full-screen overlay (no popups)
-    const overlay = document.createElement("div");
-    overlay.id = "ci-print-overlay";
-    overlay.style.position = "fixed";
-    overlay.style.inset = "0";
-    overlay.style.zIndex = "9999";
-    overlay.style.background = BRAND.bg;
-    overlay.innerHTML = app.outerHTML;
-  
-    // Print-specific CSS (landscape + ~76% scale + dark theme)
-    const style = document.createElement("style");
-    style.id = "ci-print-style";
-    style.textContent = `
-      @media print {
-        @page { size: landscape; margin: 12mm; }
-  
-        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  
-        html, body { background: ${BRAND.bg}; margin: 0; padding: 0; }
-  
-        /* Apply the scale to the overlay so the live page stays untouched */
-        #ci-print-overlay { 
-          transform: scale(0.76); 
-          transform-origin: top left; 
-          width: 131%; /* ~ 1 / 0.76 */
-        }
-  
-        /* Make sticky header normal to avoid clipping */
-        header { position: static !important; top: auto !important; }
-  
-        /* Hide UI-only bits */
-        .no-print { display: none !important; }
-  
-        /* Avoid awkward page breaks inside cards/sections */
-        .avoid-break { break-inside: avoid; page-break-inside: avoid; }
-  
-        /* Stronger borders/controls for print contrast */
-        .card { border-color: rgba(255,255,255,0.25) !important; }
-        input, textarea {
-          background: rgba(255,255,255,0.05) !important;
-          border-color: rgba(255,255,255,0.25) !important;
-          color: #ffffff !important;
-        }
-      }
-    `;
-  
-    document.head.appendChild(style);
-    document.body.appendChild(overlay);
-  
-    // Cleanup after printing
-    const cleanup = () => {
-      try {
-        overlay.remove();
-        style.remove();
-      } finally {
-        // @ts-expect-error
-        window.__ciPrinting = false;
-        window.removeEventListener("afterprint", cleanup);
-        if (mq && mq.removeEventListener) mq.removeEventListener("change", onMqChange);
-      }
-    };
-  
-    // Some browsers fire 'afterprint'; others change matchMedia('print')
-    const mq = window.matchMedia?.("print");
-    const onMqChange = (e: MediaQueryListEvent) => {
-      // when it flips back from print
-      if (!e.matches) setTimeout(cleanup, 0);
-    };
-    if (mq && mq.addEventListener) mq.addEventListener("change", onMqChange);
-  
-    window.addEventListener("afterprint", cleanup);
-  
-    // Give the overlay a tick to render, then print once
-    setTimeout(() => window.print(), 50);
+    window.print(); // no overlay, no popup
   }
   
   
-  
-
   return (
     <div id="app-root" className="min-h-screen bg-[#0E2F36] text-white">
       {/* Print helpers: keep dark colors, stronger borders, avoid breaks */}
       <style>{`
   @media print {
-    /* Force landscape + set margins */
-    @page { size: landscape; margin: 12mm; }
+    /* Portrait + sane margins at 100% scale */
+    @page { size: portrait; margin: 10mm; }
 
-    /* Keep on-screen colors in the PDF */
-    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    /* Keep dark colors as on screen */
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    html, body, #root { background: ${BRAND.bg} !important; margin: 0; padding: 0; }
 
-    /* Make sure the whole page stays dark */
-    html, body, #root { background: ${BRAND.bg} !important; }
+    /* Make sticky header normal so it doesn't repeat */
+    header { position: static !important; top: auto !important; }
 
-    /* Prevent UI controls from printing */
+    /* Hide UI-only elements (e.g., the print button) */
     .no-print { display: none !important; }
 
-    /* Avoid awkward page breaks in cards/sections */
+    /* Slightly tighter spacing in print to reduce big gaps */
+    .print-tight .p-5 { padding: 14px !important; }
+    .print-tight .mb-3 { margin-bottom: 8px !important; }
+    .print-tight .py-8 { padding-top: 16px !important; padding-bottom: 16px !important; }
+    .print-tight .space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 18px !important; }
+
+    /* Avoid awkward breaks inside cards/sections */
     .avoid-break { break-inside: avoid; page-break-inside: avoid; }
 
     /* Stronger borders for print contrast */
     .card { border-color: rgba(255,255,255,0.25) !important; }
 
-    /* Sticky headers can crop in print; make them static */
-    header { position: static !important; top: auto !important; }
+    /* Inputs remain visible on dark background */
+    input, textarea {
+      background: rgba(255,255,255,0.05) !important;
+      border-color: rgba(255,255,255,0.25) !important;
+      color: #fff !important;
+    }
   }
 `}</style>
+
 
 
       <header className="sticky top-0 z-10" style={{ background: BRAND.bg }}>
@@ -339,7 +260,7 @@ export default function App() {
         <div className="h-px w-full bg-white/10" />
       </header>
 
-      <main className="mx-auto max-w-5xl px-5 py-8 space-y-8">
+      <main className="print-tight mx-auto max-w-5xl px-5 py-8 space-y-8">
         {/* Document header */}
         <section className="card rounded-2xl bg-white/5 border border-white/10 shadow-sm p-5 avoid-break">
           <h2 className="mb-3 font-semibold text-lg text-white/90">
