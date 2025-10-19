@@ -18,6 +18,20 @@ function Logo() {
   );
 }
 
+
+function Dollars({ v }: { v: number }) {
+  const n = Number.isFinite(v) ? v : 0;
+  return (
+    <>
+      {n.toLocaleString(undefined, {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0,
+      })}
+    </>
+  );
+}
+
 function Stat({
   label,
   value,
