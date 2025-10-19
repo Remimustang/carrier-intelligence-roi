@@ -198,91 +198,98 @@ export default function App() {
 
   // -------- Export PDF: print the actual page (dark theme) --------
   function exportPdf() {
-    // Try new-window (better isolation)
-    const win = window.open("", "ci-roi-print", "width=1200,height=850,noopener,noreferrer");
-    if (win) {
-      renderPrintDoc(win);
-    } else {
-      // Fallback: inline overlay (no pop-ups)
-      renderInlinePrint();
+    // Prevent double-invocation across browsers
+    // (e.g., rapid clicks or quirky afterprint behavior)
+    // @ts-expect-error attach flag on window
+    if (window.__ciPrinting) return;
+    // @ts-expect-error
+    window.__ciPrinting = true;
+  
+    const app = document.getElementById("app-root");
+    if (!app) {
+      // Fallback: just open the dialog once
+      window.print();
+      // @ts-expect-error
+      window.__ciPrinting = false;
+      return;
     }
   
-    function renderPrintDoc(w: Window) {
-      const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
-        .map((n) => (n as HTMLElement).outerHTML)
-        .join("\n");
-      const app = document.getElementById("app-root");
-      const content = app ? app.outerHTML : document.body.innerHTML;
+    // Clone current content into a full-screen overlay (no popups)
+    const overlay = document.createElement("div");
+    overlay.id = "ci-print-overlay";
+    overlay.style.position = "fixed";
+    overlay.style.inset = "0";
+    overlay.style.zIndex = "9999";
+    overlay.style.background = BRAND.bg;
+    overlay.innerHTML = app.outerHTML;
   
-      const html = `<!doctype html><html><head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-  ${styles}
-  <style>
-  @media print {
-    @page { size: landscape; margin: 12mm; }
-    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    html, body { background: ${BRAND.bg}; margin:0; padding:0; }
-    body { transform: scale(0.76); transform-origin: top left; width: 131%; }
-    header { position: static !important; top:auto !important; }
-    .no-print { display:none !important; }
-    .avoid-break { break-inside: avoid; page-break-inside: avoid; }
-    .card { border-color: rgba(255,255,255,0.25) !important; }
-    input, textarea { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.25) !important; color:#fff !important; }
-  }
-  html, body { background:${BRAND.bg}; }
-  </style>
-  </head><body>${content}
-  <script>window.onload=()=>setTimeout(()=>{try{window.print()}finally{window.close()}},200);<\/script>
-  </body></html>`;
-      w.document.open(); w.document.write(html); w.document.close();
-    }
+    // Print-specific CSS (landscape + ~76% scale + dark theme)
+    const style = document.createElement("style");
+    style.id = "ci-print-style";
+    style.textContent = `
+      @media print {
+        @page { size: landscape; margin: 12mm; }
   
-    function renderInlinePrint() {
-      const app = document.getElementById("app-root");
-      if (!app) return window.print();
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   
-      // Clone current content into a full-screen overlay
-      const overlay = document.createElement("div");
-      overlay.id = "ci-print-overlay";
-      overlay.style.position = "fixed";
-      overlay.style.inset = "0";
-      overlay.style.zIndex = "9999";
-      overlay.style.background = `${BRAND.bg}`;
-      overlay.innerHTML = app.outerHTML;
+        html, body { background: ${BRAND.bg}; margin: 0; padding: 0; }
   
-      // Add print CSS to the overlay document
-      const style = document.createElement("style");
-      style.textContent = `
-        @media print {
-          @page { size: landscape; margin: 12mm; }
-          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          html, body { background: ${BRAND.bg}; margin:0; padding:0; }
-          #ci-print-overlay { transform: scale(0.76); transform-origin: top left; width: 131%; }
-          header { position: static !important; top:auto !important; }
-          .no-print { display:none !important; }
-          .avoid-break { break-inside: avoid; page-break-inside: avoid; }
-          .card { border-color: rgba(255,255,255,0.25) !important; }
-          input, textarea { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.25) !important; color:#fff !important; }
+        /* Apply the scale to the overlay so the live page stays untouched */
+        #ci-print-overlay { 
+          transform: scale(0.76); 
+          transform-origin: top left; 
+          width: 131%; /* ~ 1 / 0.76 */
         }
-      `;
-      document.head.appendChild(style);
-      document.body.appendChild(overlay);
   
-      const cleanup = () => {
+        /* Make sticky header normal to avoid clipping */
+        header { position: static !important; top: auto !important; }
+  
+        /* Hide UI-only bits */
+        .no-print { display: none !important; }
+  
+        /* Avoid awkward page breaks inside cards/sections */
+        .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+  
+        /* Stronger borders/controls for print contrast */
+        .card { border-color: rgba(255,255,255,0.25) !important; }
+        input, textarea {
+          background: rgba(255,255,255,0.05) !important;
+          border-color: rgba(255,255,255,0.25) !important;
+          color: #ffffff !important;
+        }
+      }
+    `;
+  
+    document.head.appendChild(style);
+    document.body.appendChild(overlay);
+  
+    // Cleanup after printing
+    const cleanup = () => {
+      try {
         overlay.remove();
         style.remove();
+      } finally {
+        // @ts-expect-error
+        window.__ciPrinting = false;
         window.removeEventListener("afterprint", cleanup);
-        media.removeEventListener("change", onChange);
-      };
-      const media = window.matchMedia("print");
-      const onChange = () => setTimeout(cleanup, 0);
+        if (mq && mq.removeEventListener) mq.removeEventListener("change", onMqChange);
+      }
+    };
   
-      window.addEventListener("afterprint", cleanup);
-      media.addEventListener?.("change", onChange);
+    // Some browsers fire 'afterprint'; others change matchMedia('print')
+    const mq = window.matchMedia?.("print");
+    const onMqChange = (e: MediaQueryListEvent) => {
+      // when it flips back from print
+      if (!e.matches) setTimeout(cleanup, 0);
+    };
+    if (mq && mq.addEventListener) mq.addEventListener("change", onMqChange);
   
-      setTimeout(() => window.print(), 50);
-    }
+    window.addEventListener("afterprint", cleanup);
+  
+    // Give the overlay a tick to render, then print once
+    setTimeout(() => window.print(), 50);
   }
+  
   
   
 
