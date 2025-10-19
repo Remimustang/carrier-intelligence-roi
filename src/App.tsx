@@ -103,13 +103,6 @@ function num(s: string) {
   const x = parseFloat((s || "").replace(/[^0-9.\-]/g, ""));
   return Number.isFinite(x) ? x : 0;
 }
-function usd(n: number) {
-  return (Number.isFinite(n) ? n : 0).toLocaleString(undefined, {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  });
-}
 
 export default function App() {
   // -------- Document header info --------
