@@ -198,11 +198,96 @@ export default function App() {
 
   // -------- Export PDF: print the actual page (dark theme) --------
   function exportPdf() {
-    window.print();
+    // Open a dedicated print window (landscape-ish size)
+    const w = window.open(
+      "",
+      "ci-roi-print",
+      "width=1200,height=850,noopener,noreferrer"
+    );
+    if (!w) {
+      alert("Please allow pop-ups for print preview.");
+      return;
+    }
+  
+    // Collect existing styles (Tailwind build links + inline styles)
+    const styleTags = Array.from(
+      document.querySelectorAll('link[rel="stylesheet"], style')
+    )
+      .map((n) => (n as HTMLElement).outerHTML)
+      .join("\n");
+  
+    // Grab just the app content
+    const app = document.getElementById("app-root");
+    const content = app ? app.outerHTML : document.body.innerHTML;
+  
+    // Build print HTML
+    const html = `<!doctype html>
+  <html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    ${styleTags}
+    <style>
+      @media print {
+        /* Force landscape + small margins */
+        @page { size: landscape; margin: 12mm; }
+  
+        /* Keep colors (dark theme) */
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  
+        /* Simulate 76% scale while still filling page width */
+        body { 
+          transform: scale(0.76); 
+          transform-origin: top left; 
+          width: 131%; /* ~ 1 / 0.76 */
+          margin: 0; 
+          padding: 0; 
+          background: ${BRAND.bg};
+        }
+  
+        /* Make sticky header static to avoid clipping */
+        header { position: static !important; top: auto !important; }
+  
+        /* Hide interactive-only controls */
+        .no-print { display: none !important; }
+  
+        /* Avoid awkward breaks inside cards/sections */
+        .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+  
+        /* Stronger card borders for print contrast */
+        .card { border-color: rgba(255,255,255,0.25) !important; }
+        input, textarea { 
+          background-color: rgba(255,255,255,0.05) !important; 
+          border-color: rgba(255,255,255,0.25) !important; 
+          color: #ffffff !important; 
+        }
+      }
+  
+      /* Also apply the dark background in the print window when not printing yet */
+      html, body { background: ${BRAND.bg}; }
+    </style>
+  </head>
+  <body>
+    ${content}
+    <script>
+      // Wait a tick so styles apply, then print and close
+      window.onload = function () {
+        setTimeout(function () {
+          try { window.print(); } finally { window.close(); }
+        }, 200);
+      };
+    <\/script>
+  </body>
+  </html>`;
+  
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
   }
+  
 
   return (
-    <div className="min-h-screen bg-[#0E2F36] text-white">
+    <div id="app-root" className="min-h-screen bg-[#0E2F36] text-white">
       {/* Print helpers: keep dark colors, stronger borders, avoid breaks */}
       <style>{`
   @media print {
